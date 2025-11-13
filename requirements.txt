@@ -1,0 +1,16 @@
+Flask==3.0.3
+numpy==1.26.4
+pandas==2.2.2
+joblib==1.4.2
+scikit-learn==1.5.1
+xgboost==2.0.3
+yfinance==0.2.40
+requests==2.32.3
+beautifulsoup4==4.12.3
+gunicorn==22.0.0
+
+# TensorFlow (CPU version only)
+tensorflow-cpu==2.15.0
+
+# Avoid pip metadata build errors
+protobuf==4.25.3
