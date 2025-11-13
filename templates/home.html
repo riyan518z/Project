@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Premium Stock Prediction Portal</title>
+
+    <!-- Load CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        body {
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            background-size: 300% 300%;
+            animation: bgAnim 11s ease infinite;
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        @keyframes bgAnim {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .outer {
+            width: 1100px;
+            margin: auto;
+            padding-bottom: 50px;
+        }
+
+        /* HERO */
+        .hero {
+            width: 100%;
+            height: 360px;
+            border-radius: 18px;
+            position: relative;
+            margin-top: 25px;
+            background: url("https://miro.medium.com/v2/resize:fit:640/format:webp/0*SaNg8uUaKCMQSS5g.jpg") center/cover;
+        }
+
+        .hero::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: 18px;
+            background: rgba(0, 0, 0, 0.55);
+        }
+
+        .hero-content {
+            position: absolute;
+            bottom: 30px;
+            left: 40px;
+            color: white;
+            z-index: 5;
+        }
+
+        .hero-content h1 {
+            font-size: 48px;
+            font-weight: 900;
+            margin-bottom: 10px;
+            text-shadow: 0 4px 12px rgba(0,0,0,0.8);
+        }
+
+        .hero-content p {
+            max-width: 500px;
+            font-size: 18px;
+            opacity: 0.9;
+        }
+
+        /* OPTIONS */
+        .choose-title {
+            text-align: center;
+            color: white;
+            margin-top: 40px;
+            font-size: 26px;
+            font-weight: bold;
+        }
+
+        .predict-grid {
+            margin-top: 25px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+        }
+
+        .predict-card {
+            background: rgba(255,255,255,0.12);
+            border-radius: 18px;
+            padding: 25px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.18);
+            backdrop-filter: blur(10px);
+            transition: 0.3s;
+            color: white;
+        }
+
+        .predict-card:hover {
+            transform: translateY(-8px);
+            background: rgba(255,255,255,0.18);
+        }
+
+        .predict-logo {
+            width: 75px;
+            height: 75px;
+            margin-bottom: 10px;
+        }
+
+        .predict-btn {
+            width: 100%;
+            padding: 12px;
+            margin-top: 12px;
+            background: linear-gradient(135deg, #00d4ff, #6c63ff);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        /* CHART */
+        .chart-container {
+            margin-top: 45px;
+            padding: 25px;
+            background: rgba(255,255,255,0.12);
+            border-radius: 18px;
+            border: 1px solid rgba(255,255,255,0.25);
+            backdrop-filter: blur(8px);
+        }
+
+        /* NEWS */
+        .news-section { margin-top: 45px; }
+
+        .news-title {
+            text-align: center;
+            color: white;
+            font-size: 26px;
+            margin-bottom: 25px;
+        }
+
+        .news-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+        }
+
+        .news-card {
+            background: rgba(255,255,255,0.12);
+            padding: 20px;
+            border-radius: 15px;
+            color: white;
+            border: 1px solid rgba(255,255,255,0.2);
+            backdrop-filter: blur(8px);
+            transition: 0.3s ease;
+        }
+
+        .news-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255,255,255,0.18);
+        }
+
+        /* TICKER */
+        @keyframes scroll-left {
+            0% {transform: translateX(100%);}
+            100% {transform: translateX(-100%);}
+        }
+    </style>
+</head>
+
+
+<body>
+<div class="outer">
+
+    <!-- HERO -->
+    <div class="hero">
+        <div class="hero-content">
+            <h1>Stock Market Predictor</h1>
+            <p>Smart forecasts powered by Machine Learning & Deep Learning.</p>
+        </div>
+    </div>
+
+    <!-- ⭐ SCROLLING LIVE STOCK TICKER ⭐ -->
+    <div id="ticker-container"
+         style="margin-top:25px; overflow:hidden; white-space:nowrap;
+         background:rgba(255,255,255,0.15); padding:12px; border-radius:10px;
+         border:1px solid rgba(255,255,255,0.25); backdrop-filter:blur(8px);">
+
+        <div id="ticker"
+             style="display:inline-block; animation:scroll-left 15s linear infinite;
+             font-size:20px; font-weight:600; color:white;">
+            Loading prices...
+        </div>
+    </div>
+
+    <!-- OPTIONS -->
+    <div class="choose-title">Choose Prediction Model</div>
+
+    <div class="predict-grid">
+
+        <div class="predict-card">
+            <img class="predict-logo" src="https://cdn-icons-png.flaticon.com/512/206/206626.png">
+            <h3>US Stock Market</h3>
+            <p>Predict stock movements using our Random Forest model.</p>
+            <a href="/us"><button class="predict-btn">Predict US Stocks</button></a>
+        </div>
+
+        <div class="predict-card">
+            <img class="predict-logo" src="https://strapi-image-uploads.s3.ap-south-1.amazonaws.com/List_of_Nifty_50_stocks_e471c6d9db.png">
+            <h3>NIFTY 50</h3>
+            <p>Predict India's benchmark index using ML.</p>
+            <a href="/nifty"><button class="predict-btn">Predict NIFTY</button></a>
+        </div>
+
+        <div class="predict-card">
+            <img class="predict-logo" src="https://cdn-icons-png.flaticon.com/512/179/179309.png">
+            <h3>Apple (AAPL)</h3>
+            <p>Next-day prediction using Deep Learning (LSTM).</p>
+            <a href="/apple"><button class="predict-btn">Predict Apple</button></a>
+        </div>
+
+    </div>
+
+    <!-- CHART -->
+    <div class="chart-container">
+        <h2 style="color:white; text-align:center;">Market Trend Overview</h2>
+        <canvas id="marketChart"></canvas>
+    </div>
+
+    <!-- NEWS -->
+    <div class="news-section">
+        <div class="news-title">Latest Market Headlines</div>
+
+        <div class="news-grid">
+
+            <div class="news-card">
+                <h4>Global Markets See Mild Gains</h4>
+                <p>Equities across Asia and Europe advanced as easing inflation and strong earnings supported investor optimism.</p>
+            </div>
+
+            <div class="news-card">
+                <h4>Nifty 50 Approaches Record Levels</h4>
+                <p>The index moved higher driven by financial and IT stocks, supported by steady macroeconomic conditions.</p>
+            </div>
+
+            <div class="news-card">
+                <h4>Tech Stocks Lift Wall Street</h4>
+                <p>US markets rallied as major tech companies posted better-than-expected quarterly results.</p>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+<!-- ⭐ Live Ticker Script -->
+<script>
+let previousPrices = {};
+
+function loadPrices() {
+    fetch("/live_prices")
+        .then(res => res.json())
+        .then(data => {
+            let tickerHTML = "";
+
+            for (let stock in data) {
+                let price = data[stock];
+                let arrow = "";
+                let color = "white";
+
+                if (previousPrices[stock] !== undefined) {
+                    if (price > previousPrices[stock]) { arrow = "▲"; color = "#00ff6a"; }
+                    else if (price < previousPrices[stock]) { arrow = "▼"; color = "#ff4d4d"; }
+                    else { arrow = "•"; }
+                }
+
+                previousPrices[stock] = price;
+
+                tickerHTML += `
+                    <span style="margin-right:40px; color:${color}">
+                        ${stock}: ₹${price} ${arrow}
+                    </span>`;
+            }
+
+            document.getElementById("ticker").innerHTML = tickerHTML;
+        });
+}
+
+loadPrices();
+setInterval(loadPrices, 3000);
+</script>
+
+<!-- ⭐ Chart Script (Static NIFTY Trend) -->
+<script>
+const ctx = document.getElementById('marketChart');
+
+new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+        datasets: [{
+            label: "NIFTY 50 Trend (Static)",
+            data: [21450, 21980, 22310, 22420, 22790, 23120],
+            borderColor: "#00d4ff",
+            backgroundColor: "rgba(0,212,255,0.25)",
+            borderWidth: 3,
+            tension: 0.4,
+            fill: true
+        }]
+    },
+    options: {
+        plugins: { legend: { labels: { color: "white" } } },
+        scales: {
+            x: { ticks: { color: "white" }},
+            y: { ticks: { color: "white" }}
+        }
+    }
+});
+</script>
+
+</body>
+</html>

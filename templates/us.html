@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>US Stock Prediction</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <style>
+        body {
+            background: linear-gradient(135deg,#0f0c29,#302b63,#24243e);
+            margin: 0;
+            color: white;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .container {
+            width: 750px;     /* more compact for better design */
+            margin: 70px auto;
+        }
+
+        .glass-card {
+            background: rgba(255,255,255,0.08);
+            backdrop-filter: blur(14px);
+            border-radius: 18px;
+            padding: 35px 45px;
+            border: 1px solid rgba(255,255,255,0.12);
+            box-shadow: 0 4px 30px rgba(0,0,0,0.3);
+            animation: fadeIn 0.6s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2 {
+            text-align: center;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .subtext {
+            text-align: center;
+            font-size: 15px;
+            opacity: 0.85;
+            margin-bottom: 35px;
+        }
+
+        /* Improved Inputs */
+        .row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 25px;  
+        }
+
+        .col {
+            width: 31%;         /* narrower input fields */
+            display: flex;
+            flex-direction: column;
+        }
+
+        .row2 .col {
+            width: 48%;         /* For Close + Volume */
+        }
+
+        label {
+            font-size: 14px;
+            margin-bottom: 8px;
+            opacity: 0.9;
+        }
+
+        input[type=number] {
+            padding: 14px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.18);
+            background: rgba(0,0,0,0.35);
+            color: white;
+            transition: 0.2s ease;
+            font-size: 15px;
+        }
+
+        input[type=number]:focus {
+            border-color: #00d4ff;
+            box-shadow: 0 0 10px #00d4ff;
+            outline: none;
+            background: rgba(0,0,0,0.45);
+        }
+
+        /* Predict Button */
+        .btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg,#00d4ff,#6c63ff);
+            border: none;
+            border-radius: 12px;
+            font-size: 17px;
+            color: white;
+            cursor: pointer;
+            font-weight: 700;
+            transition: 0.25s;
+            margin-top: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 25px rgba(0,212,255,0.5);
+        }
+
+        /* Results */
+        .result-box {
+            margin-top: 20px;
+            padding: 16px 20px;
+            border-radius: 12px;
+            font-size: 20px;
+            font-weight: 700;
+            display: inline-block;
+        }
+
+        .up {
+            background: linear-gradient(135deg,#0b6623,#00b33c);
+            box-shadow: 0 0 12px rgba(0,255,100,0.5);
+        }
+
+        .down {
+            background: linear-gradient(135deg,#7a0b0b,#ff4d4d);
+            box-shadow: 0 0 12px rgba(255,77,77,0.5);
+        }
+
+        .back-link {
+            margin-top: 18px;
+            display: inline-block;
+            color: #d8e9ff;
+            opacity: 0.9;
+            text-decoration: none;
+        }
+
+        .back-link:hover { opacity: 1; }
+
+        .error {
+            color: #ff9999;
+            margin-top: 15px;
+            font-size: 15px;
+        }
+    </style>
+</head>
+
+
+
+<body>
+<div class="container">
+    <div class="glass-card">
+
+        <h2>US Stock Direction (XGBoost)</h2>
+        <p class="subtext">Enter the latest OHLCV values — indicators are calculated automatically.</p>
+
+        <form method="POST">
+
+            <!-- OPEN HIGH LOW -->
+            <div class="row">
+                <div class="col">
+                    <label>Open</label>
+                    <input type="number" step="any" name="open" required>
+                </div>
+
+                <div class="col">
+                    <label>High</label>
+                    <input type="number" step="any" name="high" required>
+                </div>
+
+                <div class="col">
+                    <label>Low</label>
+                    <input type="number" step="any" name="low" required>
+                </div>
+            </div>
+
+            <!-- CLOSE VOLUME -->
+            <div class="row row2">
+                <div class="col">
+                    <label>Close</label>
+                    <input type="number" step="any" name="close" required>
+                </div>
+
+                <div class="col">
+                    <label>Volume</label>
+                    <input type="number" step="any" name="volume" required>
+                </div>
+            </div>
+
+            <button class="btn" type="submit">Predict Direction</button>
+        </form>
+
+        {% if direction %}
+            {% if direction == 'UP' %}
+                <div class="result-box up">🟢 UP — {{ confidence }}</div>
+            {% else %}
+                <div class="result-box down">🔴 DOWN — {{ confidence }}</div>
+            {% endif %}
+            <br>
+            <a class="back-link" href="/">← Back to Home</a>
+        {% endif %}
+
+        {% if error %}
+            <div class="error">Error: {{ error }}</div>
+        {% endif %}
+
+    </div>
+</div>
+</body>
+</html>

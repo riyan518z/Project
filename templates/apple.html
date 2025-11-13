@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Apple Stock Prediction</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<div class="card">
+
+    <h2>Apple Stock Prediction</h2>
+    <p>Upload a CSV file containing a <b>Price</b> column.</p>
+
+    <!-- ✅ Show prediction -->
+    {% if prediction %}
+        <div class="result">
+            Predicted Next Closing Price:<br>
+            <strong style="font-size: 30px;">{{ prediction }}</strong>
+        </div>
+
+        <a href="/apple" class="primary-btn">Upload Another File</a>
+        <a href="/" class="secondary-btn">Back to Home</a>
+
+    {% else %}
+        <!-- ✅ Upload Form -->
+        <form action="/apple" method="POST" enctype="multipart/form-data">
+            <input type="file" name="file" accept=".csv" required>
+            <button type="submit" class="green-btn">Predict Next Price</button>
+        </form>
+
+        <a href="/" class="secondary-btn">Back to Home</a>
+    {% endif %}
+
+    {% if error %}
+        <div class="error">{{ error }}</div>
+    {% endif %}
+
+</div>
+
+</body>
+</html>

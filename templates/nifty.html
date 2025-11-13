@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Stock Prediction</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+<div class="card">
+    <h2>Stock Market Price Prediction</h2>
+
+    <form method="POST">
+
+        <label>Open</label>
+        <input type="number" step="any" name="Open">
+
+        <label>High</label>
+        <input type="number" step="any" name="High">
+
+        <label>Low</label>
+        <input type="number" step="any" name="Low">
+
+        <label>Volume</label>
+        <input type="number" step="any" name="Volume">
+
+        <label>SMA 10</label>
+        <input type="number" step="any" name="SMA_10">
+
+        <label>SMA 20</label>
+        <input type="number" step="any" name="SMA_20">
+
+        <label>RSI</label>
+        <input type="number" step="any" name="RSI">
+
+        <label>MACD</label>
+        <input type="number" step="any" name="MACD">
+
+        <label>Volatility</label>
+        <input type="number" step="any" name="Volatility">
+
+        <button type="submit">Predict</button>
+    </form>
+
+    {% if prediction %}
+        <div class="result">Predicted Close Price: ₹{{ prediction }}</div>
+    {% endif %}
+
+    {% if error %}
+        <div class="error">Error: {{ error }}</div>
+    {% endif %}
+
+    <!-- ✅ Back button added below -->
+    <button onclick="window.location.href='/'" style="margin-top: 15px;">Back to Home</button>
+
+</div>
+</body>
+</html>

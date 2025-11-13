@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Prediction Result</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <div class="card">
+        <h2>Prediction Result</h2>
+        <p>The predicted next price is:</p>
+
+        <h1 style="color:#4CAF50;">
+            {{ prediction | round(2) }}
+        </h1>
+
+        <a class="predict-btn" href="/">Upload Another File</a>
+    </div>
+
+</body>
+</html>
