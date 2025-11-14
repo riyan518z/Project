@@ -25,14 +25,33 @@ APPLE_SCALER_PATH = "scaler.pkl"
 HISTORICAL_CSV = "final.csv"
 
 # ------------------------------------------------------
-# LOAD MODELS
+# LAZY MODEL LOADING (Memory Optimization)
 # ------------------------------------------------------
-us_model = joblib.load(US_MODEL_PATH)
-nifty_model = joblib.load(NIFTY_MODEL_PATH)
+us_model = None
+nifty_model = None
+apple_lstm = None
+apple_scaler = None
 
-apple_lstm = tf.keras.models.load_model(APPLE_MODEL_PATH)
-with open(APPLE_SCALER_PATH, "rb") as f:
-    apple_scaler = pickle.load(f)
+def get_us_model():
+    global us_model
+    if us_model is None:
+        us_model = joblib.load(US_MODEL_PATH)
+    return us_model
+
+def get_nifty_model():
+    global nifty_model
+    if nifty_model is None:
+        nifty_model = joblib.load(NIFTY_MODEL_PATH)
+    return nifty_model
+
+def get_apple_models():
+    global apple_lstm, apple_scaler
+    if apple_lstm is None:
+        apple_lstm = tf.keras.models.load_model(APPLE_MODEL_PATH)
+    if apple_scaler is None:
+        with open(APPLE_SCALER_PATH, "rb") as f:
+            apple_scaler = pickle.load(f)
+    return apple_lstm, apple_scaler
 
 SEQ_LEN = 60
 
@@ -136,10 +155,11 @@ def us_stock():
             # ⭐ FIX: convert to numpy
             X = features_df.to_numpy()
 
-            pred = us_model.predict(X)[0]
+            model = get_us_model()
+            pred = model.predict(X)[0]
 
             try:
-                prob = us_model.predict_proba(X)[0][int(pred)]
+                prob = model.predict_proba(X)[0][int(pred)]
             except:
                 prob = 0.5
 
@@ -177,7 +197,8 @@ def nifty():
                 "Open","High","Low","Volume","SMA_10","SMA_20","RSI","MACD","Volatility"
             ])
 
-            prediction = float(nifty_model.predict(df)[0])
+            model = get_nifty_model()
+            prediction = float(model.predict(df)[0])
             prediction = round(prediction, 2)
 
         except Exception as e:
@@ -207,11 +228,12 @@ def apple():
             file.save(save_path)
 
             seq = process_apple_csv(save_path)
-            scaled = apple_scaler.transform(seq)
+            lstm_model, scaler = get_apple_models()
+            scaled = scaler.transform(seq)
             scaled = np.expand_dims(scaled, 0)
 
-            p_scaled = apple_lstm.predict(scaled)[0][0]
-            prediction = apple_scaler.inverse_transform([[p_scaled]])[0][0]
+            p_scaled = lstm_model.predict(scaled)[0][0]
+            prediction = scaler.inverse_transform([[p_scaled]])[0][0]
             prediction = round(float(prediction), 2)
 
         except Exception as e:
