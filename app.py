@@ -1,10 +1,13 @@
+import os
+# Suppress TensorFlow warnings (CUDA, CPU optimization messages)
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'  # 0=all, 1=exclude INFO, 2=exclude INFO+WARNING
+
 from flask import Flask, render_template, request
 import numpy as np
 import pandas as pd
 import joblib
 import tensorflow as tf
 import pickle
-import os
 import random
 import yfinance as yf   # ⭐ REAL TIME DATA
 
@@ -240,8 +243,8 @@ def live_prices():
 
             prices[name] = round(float(price), 2) if price else "N/A"
 
-        except:0+2
-    prices[name] = "N/A"
+        except:
+            prices[name] = "N/A"
 
     return prices
 
